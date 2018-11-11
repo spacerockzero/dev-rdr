@@ -1,0 +1,1 @@
+// get articles from db methods

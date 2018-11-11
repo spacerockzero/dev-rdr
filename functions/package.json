@@ -1,0 +1,37 @@
+{
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "coverage": "NODE_ENV=test nyc report --reporter=text-lcov",
+    "test": "NODE_ENV=test nyc mocha test/*-test.js --exit",
+    "citest": "CI=true NODE_ENV=test nyc mocha test/*-test.js --exit",
+    "lint": "eslint .",
+    "serve": "firebase serve --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "dependencies": {
+    "firebase-admin": "~6.0.0",
+    "firebase-functions": "^2.1.0",
+    "got": "^9.3.2",
+    "joi": "^14.0.4",
+    "metascraper": "^4.5.5",
+    "rss-parser": "^3.5.3",
+    "rxjs": "^6.3.3",
+    "unfluff": "^3.2.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "eslint": "^4.19.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "firebase-tools": "^6.0.1",
+    "mocha": "^5.2.0",
+    "nyc": "^13.1.0"
+  },
+  "engines": {
+    "node": "8"
+  },
+  "private": true
+}
