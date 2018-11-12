@@ -35,5 +35,35 @@ describe('article', () => {
       const newArticle = makeArticle(incompleteInput);
       expect(newArticle).to.be.an('error');
     });
+
+    it('should reject invalid title input', () => {
+      const invalidInput = {
+        title: 7,
+        link: 'https://www.jakobanderson.com',
+        feedsrc: 'totes legit source'
+      };
+      const newArticle = makeArticle(invalidInput);
+      expect(newArticle).to.be.an('error');
+    });
+
+    it('should reject invalid link input', () => {
+      const invalidInput = {
+        title: 'totes legit article',
+        link: 'www.jakobanderson.com',
+        feedsrc: 'totes legit source'
+      };
+      const newArticle = makeArticle(invalidInput);
+      expect(newArticle).to.be.an('error');
+    });
+
+    it('should reject invalid feedsrc input', () => {
+      const invalidInput = {
+        title: 'totes legit article',
+        link: 'www.jakobanderson.com',
+        feedsrc: 42
+      };
+      const newArticle = makeArticle(invalidInput);
+      expect(newArticle).to.be.an('error');
+    });
   });
 });

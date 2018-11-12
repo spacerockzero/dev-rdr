@@ -5,7 +5,7 @@ const Joi = require('joi');
 const schema = Joi.object().keys({
   title: Joi.string().required(),
   link: Joi.string()
-    .uri()
+    .uri({scheme: ['http', 'https']})
     .required(),
   feedsrc: Joi.string().required(),
   labels: Joi.array().items(Joi.string()),
