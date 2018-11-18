@@ -83,7 +83,7 @@ describe('feeds', function() {
     it('should not fail', () => {
       return processFlow(sources)
         .then(content => {
-          expect(content).to.exist;
+          return expect(content).to.exist;
         })
         .catch(error => expect(error).to.not.exist);
     });
@@ -97,6 +97,7 @@ describe('feeds', function() {
           expect(metaData).to.exist;
           expect(metaData.title).to.exist;
           expect(metaData.text).to.exist;
+          return;
         })
         .catch(error => expect(error).to.not.exist);
     });

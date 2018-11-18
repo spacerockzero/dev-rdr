@@ -11,8 +11,9 @@
     "build": "preact build",
     "serve": "preact build && preact serve",
     "dev": "preact watch",
-    "lint": "eslint src",
-    "test": "jest"
+    "lint": "eslint src && npm --prefix ./functions run lint",
+    "test": "jest",
+    "postinstall": "npm --prefix ./functions install"
   },
   "eslintConfig": {
     "extends": "eslint-config-synacor"

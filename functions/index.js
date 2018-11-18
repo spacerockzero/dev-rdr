@@ -103,30 +103,33 @@ exports.updateArticles = functions.https.onRequest(async (req, res) => {
 });
 
 // When new docs are saved, go get their metadata for thumbnails and whatnot
-exports.getMeta = functions.firestore.document('publicArticles/{articleId}').onCreate(event => {
-  console.log('getMeta', event.data);
-  const doc = event.data.data();
+exports.getMeta = functions.firestore.document('publicArticles/{articleId}').onCreate((snap, context) => {
+  const doc = snap.data();
   console.log('doc:', doc);
   const linkURL = doc.link;
   console.log('link:', linkURL);
   if (linkURL) {
-    scrapeUrl(linkURL).then(metadata => {
-      console.log('metadata:', metadata);
-      // console.log('metadata.image', metadata.image);
-      if (metadata.image) {
-        return db
-          .collection('publicArticles')
-          .doc(doc.id)
-          .update({image: metadata.image})
-          .then(result => {
-            console.log('doc.id', doc.id);
-            console.log('image:', metadata.image);
-            console.log('db write result:', result);
-            return metadata;
-          })
-          .catch(err => console.error('Err writing img to db:', err));
-      }
-      return metadata;
-    });
+    scrapeUrl(linkURL)
+      .then(metadata => {
+        console.log('metadata:', metadata);
+        // console.log('metadata.image', metadata.image);
+        if (metadata.image) {
+          return db
+            .collection('publicArticles')
+            .doc(doc.id)
+            .update({image: metadata.image})
+            .then(result => {
+              console.log('doc.id', doc.id);
+              console.log('image:', metadata.image);
+              console.log('db write result:', result);
+              return metadata;
+            })
+            .catch(error => console.error('Error writing metadata to db:', error));
+        }
+        return metadata;
+      })
+      .catch(error => {
+        console.error('Error scraping URL:', error);
+      });
   }
 });
