@@ -60,7 +60,6 @@ const cleanObjects = objects => {
       const filteredLabels = filterLabels(item.labels);
       cleanObj.labels = filteredLabels;
     }
-    // console.log('cleanObj', cleanObj);
     return cleanObj;
   });
   return cleaned;
@@ -69,7 +68,8 @@ const cleanObjects = objects => {
 // getArticlesFlow
 const processFlow = async sources => {
   const content = await getFeeds(sources);
-  const cleanedContent = cleanObjects(content);
+  const flattened = flattenFeeds(content);
+  const cleanedContent = cleanObjects(flattened);
   return cleanedContent;
 };
 
