@@ -14,7 +14,7 @@ const sources = [
   }
 ];
 
-const {getFeeds, flattenFeeds, filterLabels} = require('../lib/feeds');
+const {getFeeds, flattenFeeds, filterLabels, processFlow, scrapeUrl} = require('../lib/feeds');
 
 describe('feeds', function() {
   this.timeout(20000);
@@ -76,6 +76,29 @@ describe('feeds', function() {
     it('should keep the good stuff', () => {
       expect(filtered).to.contain('javascript');
       expect(filtered).to.contain('css');
+    });
+  });
+
+  describe('processFlow', () => {
+    it('should not fail', () => {
+      return processFlow(sources)
+        .then(content => {
+          expect(content).to.exist;
+        })
+        .catch(error => expect(error).to.not.exist);
+    });
+  });
+
+  describe('scrapeUrl', () => {
+    it('should not fail', () => {
+      const link = feeds[0].items[0].link;
+      return scrapeUrl(link)
+        .then(metaData => {
+          expect(metaData).to.exist;
+          expect(metaData.title).to.exist;
+          expect(metaData.text).to.exist;
+        })
+        .catch(error => expect(error).to.not.exist);
     });
   });
 });

@@ -67,8 +67,19 @@ const cleanObjects = objects => {
 };
 
 // getArticlesFlow
+const processFlow = async sources => {
+  const content = await getFeeds(sources);
+  const cleanedContent = cleanObjects(content);
+  return cleanedContent;
+};
 
 // scrapeUrl
+const scrapeUrl = async targetUrl => {
+  // scrape link url for meta, ogdata
+  const {body: html, url} = await got(targetUrl);
+  const metaData = extractor(html);
+  return metaData;
+};
 
 // saveToDb
 
@@ -77,5 +88,7 @@ const cleanObjects = objects => {
 module.exports = {
   getFeeds,
   flattenFeeds,
-  filterLabels
+  filterLabels,
+  processFlow,
+  scrapeUrl
 };
