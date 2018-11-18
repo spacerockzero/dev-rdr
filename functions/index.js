@@ -3,7 +3,7 @@ const functions = require('firebase-functions');
 // The Firebase Admin SDK to access the Firebase Realtime Database.
 const admin = require('firebase-admin');
 // app libs
-const {processFlow} = require('./lib/feeds');
+const {processFlow, scrapeUrl} = require('./lib/feeds');
 const {updateArticles} = require('./lib/update');
 const {makeArticle} = require('./lib/article');
 const sources = require('./lib/sources');
@@ -29,6 +29,8 @@ const getArticlesHandler = async (limit, page, sort) => {
     const articles = [];
     snapshot.forEach(doc => {
       const document = doc.data();
+      const timestamp = document.createdOn;
+      document.createdOn = timestamp.toDate();
       articles.push(document);
     });
     return articles;
@@ -98,4 +100,33 @@ exports.updateArticles = functions.https.onRequest(async (req, res) => {
     console.error('updatefeed endpoint err:', err);
   }
   return res.status(status).send(result);
+});
+
+// When new docs are saved, go get their metadata for thumbnails and whatnot
+exports.getMeta = functions.firestore.document('publicArticles/{articleId}').onCreate(event => {
+  console.log('getMeta', event.data);
+  const doc = event.data.data();
+  console.log('doc:', doc);
+  const linkURL = doc.link;
+  console.log('link:', linkURL);
+  if (linkURL) {
+    scrapeUrl(linkURL).then(metadata => {
+      console.log('metadata:', metadata);
+      // console.log('metadata.image', metadata.image);
+      if (metadata.image) {
+        return db
+          .collection('publicArticles')
+          .doc(doc.id)
+          .update({image: metadata.image})
+          .then(result => {
+            console.log('doc.id', doc.id);
+            console.log('image:', metadata.image);
+            console.log('db write result:', result);
+            return metadata;
+          })
+          .catch(err => console.error('Err writing img to db:', err));
+      }
+      return metadata;
+    });
+  }
 });

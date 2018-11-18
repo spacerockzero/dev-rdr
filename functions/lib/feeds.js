@@ -14,7 +14,6 @@ const getFeeds = async sources => {
   try {
     const sourceProms = sources.map(async source => await parser.parseURL(source.url));
     const res = await Promise.all(sourceProms);
-    // console.log(JSON.stringify(res, null, 2));
     return res;
   } catch (error) {
     console.log('getFeeds error:', error);
