@@ -3,10 +3,10 @@ import { uniqBy, differenceBy, orderBy } from 'lodash-es';
 import InfiniteScroll from 'react-infinite-scroller';
 import style from './style';
 
-const API_URL =
-	process.env.PREACT_APP_ENV === 'development'
-		? 'http://localhost:5001/dev-rdr/us-central1/getArticles'
-		: 'https://us-central1-dev-rdr.cloudfunctions.net/getArticles';
+const API_URL = 'https://us-central1-dev-rdr.cloudfunctions.net/getArticles';
+// process.env.PREACT_APP_ENV === 'development'
+// 	? 'http://localhost:5001/dev-rdr/us-central1/getArticles'
+// 	: 'https://us-central1-dev-rdr.cloudfunctions.net/getArticles';
 
 class ArticleList extends Component {
 	constructor(props) {
