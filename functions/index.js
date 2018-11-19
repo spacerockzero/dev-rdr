@@ -9,6 +9,9 @@ const {makeArticle} = require('./lib/article');
 const {getSentiment} = require('./lib/sentiment');
 const sources = require('./lib/sources');
 
+const defaultLimit = 25;
+const defaultSort = 'desc';
+
 admin.initializeApp(functions.config().firebase);
 const db = admin.firestore();
 const settings = {
@@ -19,19 +22,33 @@ db.settings(settings);
 // methods
 
 // get articles method for UI
-const getArticlesHandler = async (limit, page, sort) => {
+const getArticlesHandler = async (limit = defaultLimit, after, sort = defaultSort) => {
   // TODO: limit, page, sort
   try {
-    const snapshot = await db
-      .collection('publicArticles')
-      .orderBy('createdOn', 'desc')
-      .limit(50)
-      .get();
+    let snapshot;
+    if (after) {
+      // pagination
+      const date = new Date(after);
+      snapshot = await db
+        .collection('publicArticles')
+        .limit(limit)
+        .orderBy('createdOn', sort)
+        .startAfter(date)
+        .get();
+    } else {
+      // first load
+      snapshot = await db
+        .collection('publicArticles')
+        .orderBy('createdOn', sort)
+        .limit(limit)
+        .get();
+    }
+
     const articles = [];
     snapshot.forEach(doc => {
       const document = doc.data();
       const timestamp = document.createdOn;
-      document.createdOn = timestamp.toDate();
+      document.createdOn = timestamp.toMillis();
       articles.push(document);
     });
     return articles;
@@ -80,13 +97,15 @@ const saveArticles = articles => {
 
 // send new articles to UI client
 exports.getArticles = functions.https.onRequest((req, res) => {
-  // req.query.limit
-  // req.query.page
-  // req.query.sort
-  let result;
-  let status;
   // TODO: limit, page, sort
-  getArticlesHandler()
+  const limit = parseInt(req.query.limit) || defaultLimit;
+  const after = parseInt(req.query.after) || null;
+  const sort = req.query.sort || defaultSort;
+  console.log('limit:', limit);
+  console.log('after:', after);
+  console.log('sort:', sort);
+  console.log(' ');
+  getArticlesHandler(limit, after, sort)
     .then(result => res.status(200).send(result))
     .catch(error => {
       console.error('getArticles endpoint err:', error);
