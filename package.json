@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "engines": {
-    "node": 8
+    "node": "8"
   },
   "scripts": {
     "start": "if-env NODE_ENV=production && npm run -s serve || npm run -s dev",
@@ -28,12 +28,15 @@
     "if-env": "^1.0.0",
     "jest": "^21.2.1",
     "preact-cli": "^2.1.0",
+    "preact-cli-plugin-env-vars": "^1.2.1",
     "preact-render-spy": "^1.2.1"
   },
   "dependencies": {
+    "lodash-es": "^4.17.11",
     "preact": "^8.2.6",
-    "preact-compat": "^3.17.0",
-    "preact-router": "^2.5.7"
+    "preact-compat": "^3.18.4",
+    "preact-router": "^2.5.7",
+    "react-infinite-scroller": "^1.2.2"
   },
   "jest": {
     "verbose": true,

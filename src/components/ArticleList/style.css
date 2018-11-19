@@ -1,0 +1,8 @@
+.list {
+  margin: 1em;
+}
+.article {
+  display: block;
+  padding: 1em;
+  border-bottom: 1px dashed black;
+}

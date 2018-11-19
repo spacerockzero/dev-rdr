@@ -2,6 +2,7 @@
 const functions = require('firebase-functions');
 // The Firebase Admin SDK to access the Firebase Realtime Database.
 const admin = require('firebase-admin');
+const cors = require('cors')({origin: true});
 // app libs
 const {processFlow, scrapeUrl} = require('./lib/feeds');
 const {updateArticles} = require('./lib/update');
@@ -97,34 +98,44 @@ const saveArticles = articles => {
 
 // send new articles to UI client
 exports.getArticles = functions.https.onRequest((req, res) => {
-  // TODO: limit, page, sort
-  const limit = parseInt(req.query.limit) || defaultLimit;
-  const after = parseInt(req.query.after) || null;
-  const sort = req.query.sort || defaultSort;
-  console.log('limit:', limit);
-  console.log('after:', after);
-  console.log('sort:', sort);
-  console.log(' ');
-  getArticlesHandler(limit, after, sort)
-    .then(result => res.status(200).send(result))
-    .catch(error => {
-      console.error('getArticles endpoint err:', error);
-      return res.status(500).send(error);
-    });
+  if (req.method === 'PUT') {
+    return res.status(403).send('Forbidden!');
+  }
+  return cors(req, res, () => {
+    // TODO: limit, page, sort
+    const limit = parseInt(req.query.limit) || defaultLimit;
+    const after = parseInt(req.query.after) || null;
+    const sort = req.query.sort || defaultSort;
+    console.log('limit:', limit);
+    console.log('after:', after);
+    console.log('sort:', sort);
+    console.log(' ');
+    return getArticlesHandler(limit, after, sort)
+      .then(result => res.status(200).send(result))
+      .catch(error => {
+        console.error('getArticles endpoint err:', error);
+        return res.status(500).send(error);
+      });
+  });
 });
 
-exports.updateArticles = functions.https.onRequest(async (req, res) => {
-  let result;
-  let status;
-  try {
-    result = await updateArticlesHandler();
-    status = 200;
-  } catch (err) {
-    result = err;
-    status = 500;
-    console.error('updatefeed endpoint err:', err);
+exports.updateArticles = functions.https.onRequest((req, res) => {
+  if (req.method === 'PUT') {
+    return res.status(403).send('Forbidden!');
   }
-  return res.status(status).send(result);
+  return cors(req, res, async () => {
+    let result;
+    let status;
+    try {
+      result = await updateArticlesHandler();
+      status = 200;
+    } catch (err) {
+      result = err;
+      status = 500;
+      console.error('updatefeed endpoint err:', err);
+    }
+    return res.status(status).send(result);
+  });
 });
 
 // When new docs are saved, go get their metadata for thumbnails and whatnot
