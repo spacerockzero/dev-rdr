@@ -8,37 +8,37 @@ module.exports = [
     name: 'Joel on Software',
     type: 'rss',
     url: 'https://www.joelonsoftware.com/feed/'
+  },
+  {
+    name: 'EchoJS',
+    type: 'rss',
+    url: 'http://www.echojs.com/rss'
+  },
+  {
+    name: 'JavaScript Weekly',
+    type: 'rss',
+    url: 'http://javascriptweekly.com/rss/11pe1imi'
+  },
+  {
+    name: 'Lobsters',
+    type: 'rss',
+    url: 'https://lobste.rs/rss'
+  },
+  {
+    name: 'Free Code Camp',
+    type: 'rss',
+    url: 'https://medium.freecodecamp.org/feed'
+  },
+  {
+    name: 'Hackernoon',
+    type: 'rss',
+    url: 'https://hackernoon.com/feed'
+  },
+  {
+    name: 'Medium - JavaScript',
+    type: 'rss',
+    url: 'https://medium.com/feed/topic/javascript/'
   }
-  // {
-  //   name: 'EchoJS',
-  //   type: 'rss',
-  //   url: 'http://www.echojs.com/rss'
-  // },
-  // {
-  //   name: 'JavaScript Weekly',
-  //   type: 'rss',
-  //   url: 'http://javascriptweekly.com/rss/11pe1imi'
-  // },
-  // {
-  //   name: 'Lobsters',
-  //   type: 'rss',
-  //   url: 'https://lobste.rs/rss'
-  // },
-  // {
-  //   name: 'Free Code Camp',
-  //   type: 'rss',
-  //   url: 'https://medium.freecodecamp.org/feed'
-  // },
-  // {
-  //   name: 'Hackernoon',
-  //   type: 'rss',
-  //   url: 'https://hackernoon.com/feed'
-  // },
-  // {
-  //   name: 'Medium - JavaScript',
-  //   type: 'rss',
-  //   url: 'https://medium.com/feed/topic/javascript/'
-  // },
   // // {
   // //   name: 'Medium - AI',
   // //   type: 'rss',

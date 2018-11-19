@@ -6,6 +6,7 @@ const admin = require('firebase-admin');
 const {processFlow, scrapeUrl} = require('./lib/feeds');
 const {updateArticles} = require('./lib/update');
 const {makeArticle} = require('./lib/article');
+const {getSentiment} = require('./lib/sentiment');
 const sources = require('./lib/sources');
 
 admin.initializeApp(functions.config().firebase);
@@ -53,15 +54,20 @@ const updateArticlesHandler = () => {
       });
     })
     .then(articles => {
-      return saveArticles(articles).then(results => {
-        return results;
-      });
+      console.log('before save: articles.length:', articles.length);
+      return saveArticles(articles)
+        .then(results => {
+          return results;
+        })
+        .catch(error => {
+          console.error('Save articles error:', error);
+        });
     });
 };
 
 // save new articles to db
 const saveArticles = articles => {
-  const collectionRef = db.collection('publicArticles');
+  const collectionRef = db.collection('rawArticles');
   const batch = db.batch();
   articles.forEach(article => {
     const ref = collectionRef.doc(article.id);
@@ -103,33 +109,48 @@ exports.updateArticles = functions.https.onRequest(async (req, res) => {
 });
 
 // When new docs are saved, go get their metadata for thumbnails and whatnot
-exports.getMeta = functions.firestore.document('publicArticles/{articleId}').onCreate((snap, context) => {
+exports.getMeta = functions.firestore.document('rawArticles/{articleId}').onCreate((snap, context) => {
   const doc = snap.data();
   console.log('doc:', doc);
-  const linkURL = doc.link;
-  console.log('link:', linkURL);
-  if (linkURL) {
-    scrapeUrl(linkURL)
+  console.log('doc.link:', doc.link);
+  if (doc.link) {
+    return scrapeUrl(doc.link)
       .then(metadata => {
         console.log('metadata:', metadata);
-        // console.log('metadata.image', metadata.image);
-        if (metadata.image) {
+        console.log('metadata.image', metadata.image);
+        if (metadata) {
+          const newDoc = doc;
+          // set opengraph + image
+          newDoc.opengraph = {
+            image: metadata.image || null,
+            title: doc.title || null,
+            description: metadata.description || null,
+            url: doc.link
+          };
+          // get positivity score
+          newDoc.sentiment = {
+            score: getSentiment(newDoc).score
+          };
+          console.log('newDoc', newDoc);
+          // finally, save it to public
           return db
             .collection('publicArticles')
             .doc(doc.id)
-            .update({image: metadata.image})
+            .set(newDoc)
             .then(result => {
               console.log('doc.id', doc.id);
-              console.log('image:', metadata.image);
+              console.log('newDoc:', newDoc);
               console.log('db write result:', result);
-              return metadata;
+              return result;
             })
             .catch(error => console.error('Error writing metadata to db:', error));
         }
-        return metadata;
+        return;
       })
       .catch(error => {
         console.error('Error scraping URL:', error);
       });
+  } else {
+    return Promise.reject(new Error('no doc.link, which is required!'));
   }
 });
